@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plant_id}} Dashboard</title>
+</head>
+<body>
+    <h1>{{ plant_id }} Dashboard</h1>
+
+    <canvas id="airTempChart" width="400" height="200"></canvas>
+    <canvas id="airHumidChart" width="400" height="200"></canvas>
+    <canvas id="soilMoistChart" width="400" height="200"></canvas>
+    <canvas id="lightChart" width="400" height="200"></canvas>
+
+    <script>
+        //get data
+        const readings = {{ readings|tojson }};
+
+        //Extract arrays for each metric
+        const timestamps = readings.map(r => r.timestamp).reverse();
+        const airTemps = readings.map(r => r.air_temp).reverse();
+        const airHumids = readings.map(r => r.airHumid).reverse();
+        const soilMoists = readings.map(r => r.soil_moist).reverse();
+        const light = readings.map(r => r.light).reverse();
+
+        //Helper function to create chat
+        function createChart(ctxId, label, data, color) {
+            const ctx = document.getElementId(ctxId).getContext('2d')
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels:timestamps,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color + '33', //translucent fill
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { display: true, title: { display: true, text: 'Timestamp'}},
+                        y: { display: true, title: { display: true, text: label }}
+                    }
+                }
+            });
+        }
+
+        //Create charts
+        createChart('airTempChart', 'Air Temperature (°C)', airTemps, 'red');
+        createChart('airHumidChart', 'Air Humidity (%)', airTemps, 'red');
+        createChart('airTempChart', 'Soil Moisture (%)', airTemps, 'red');
+        createChart('lightChart', 'Light', lights, 'orange');
+
+    </script>
+    
+</body>
+</html>
